@@ -1,0 +1,141 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://raw.githubusercontent.com/colmr/vis_class/master/video_games.csv"
+  },
+  "title": {
+    "text": "Video Game Sales Explorer",
+    "anchor": "middle",
+    "fontSize": 24,
+    "offset": 20
+  },
+  "transform": [{"filter": "datum.EU_Sales > 0"}],
+  "vconcat": [
+    {
+      "hconcat": [
+        {
+          "mark": "circle",
+          "width": 400,
+          "height": 400,
+          "transform": [
+            {"filter": {"param": "click"}},
+            {"filter": {"param": "legend"}},
+            {"filter": {"param": "bottom"}}
+          ],
+          "params": [
+            {"name": "brush", "select": {"type": "interval"}},
+            {
+              "name": "legend",
+              "select": {"type": "point", "fields": ["Platform"]},
+              "bind": "legend"
+            }
+          ],
+          "encoding": {
+            "color": {
+              "condition": {
+                "param": "brush",
+                "field": "Platform",
+                "type": "nominal",
+                "scale": {
+                  "domain": [
+                    "PC",
+                    "PS3",
+                    "PS4",
+                    "PSP",
+                    "Wii",
+                    "WiiU",
+                    "X360",
+                    "XOne"
+                  ]
+                }
+              },
+              "value": "lightgrey"
+            },
+            "x": {
+              "field": "EU_Sales",
+              "type": "quantitative",
+              "title": "EU Sales (Millions)",
+              "scale": {"type": "log", "domain": [0.005, 50]}
+            },
+            "y": {
+              "field": "Global_Sales",
+              "type": "quantitative",
+              "title": "Global Sales (Millions)",
+              "scale": {"type": "log", "domain": [0.005, 100]}
+            },
+            "tooltip": {"field": "Name", "type": "nominal"}
+          }
+        },
+        {
+          "mark": {"type": "bar", "tooltip": true},
+          "width": 200,
+          "height": 400,
+          "transform": [
+            {"filter": {"param": "brush"}},
+            {"filter": {"param": "legend"}},
+            {"filter": {"param": "bottom"}}
+          ],
+          "params": [
+            {"name": "click", "select": {"type": "point", "encodings": ["y"]}}
+          ],
+          "encoding": {
+            "color": {
+              "condition": {
+                "param": "click",
+                "field": "Platform",
+                "type": "nominal"
+              },
+              "value": "lightgrey"
+            },
+            "x": {
+              "field": "Genre",
+              "title": "# Games",
+              "type": "quantitative",
+              "aggregate": "count"
+            },
+            "y": {
+              "field": "Genre",
+              "title": "",
+              "type": "nominal",
+              "sort": {"op": "count", "field": "Genre", "order": "descending"}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mark": {"type": "bar", "tooltip": true},
+      "width": 700,
+      "height": 100,
+      "transform": [
+        {"filter": {"param": "brush"}},
+        {"filter": {"param": "click"}},
+        {"filter": {"param": "legend"}}
+      ],
+      "params": [
+        {"name": "bottom", "select": {"type": "interval", "encodings": ["x"]}}
+      ],
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "timeUnit": "year",
+          "type": "temporal",
+          "axis": {"title": "Year"}
+        },
+        "y": {"title": "# Games", "aggregate": "count"},
+        "color": {
+          "condition": {
+            "param": "bottom",
+            "field": "Platform",
+            "type": "nominal"
+          },
+          "value": "lightgrey"
+        }
+      }
+    }
+  ],
+  "config": {
+    "axisY": {"minExtent": 30},
+    "axis": {"titleFontSize": 15, "labelFontSize": 12}
+  }
+}
